@@ -6,8 +6,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
+import org.ypq.springboothelloworld.api.ProductService;
 
 import java.util.List;
 import java.util.Random;
@@ -22,6 +25,7 @@ import java.util.Random;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @EnableEurekaClient
+@EnableFeignClients
 @ActiveProfiles({"aliyun"})
 public class SpringboothelloworldApplicationTests {
 
@@ -30,6 +34,9 @@ public class SpringboothelloworldApplicationTests {
 
 	@Autowired
 	private LoadBalancerClient loadBalancerClient;
+
+	@Autowired
+	private ProductService productService;
 
 	@Test
 	public void contextLoads() {
@@ -62,6 +69,15 @@ public class SpringboothelloworldApplicationTests {
         }
         Assert.assertEquals(1, plist.size());
 
+    }
+
+    @Test
+    public void testFeign() {
+	    List<Product> products = productService.getProducts();
+        for (Product p : products) {
+            System.err.println(p.getId() + " " + p.getName());
+        }
+        Assert.assertEquals(3, products.size());
     }
 
 }
